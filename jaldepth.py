@@ -4,7 +4,7 @@ Scenes: 'street' (real CCTV / photos) or 'rig' (table-top tray with a toy car, t
 import os, json
 import numpy as np, cv2
 HERE = os.path.dirname(os.path.abspath(__file__))
-WATER_W = os.path.join(HERE, "models", "yolov8n-seg-water.pt"); CLS_W = os.path.join(HERE, "models", "yolov8n-cls-depth.pt"); WATER_IN_W = os.path.join(HERE, "models", "yolov8n-seg-water-in.pt"); DET_W = os.path.join(HERE, "models", "yolov8n.pt")
+WATER_W = os.path.join(HERE, "models", "yolov8n-seg-water.pt"); CLS_W = os.path.join(HERE, "models", "yolov8n-cls-depth.pt"); WATER_IN_W = os.path.join(HERE, "models", "yolov8n-seg-water-in.pt"); WATER_ASIA_W = os.path.join(HERE, "models", "yolov8n-seg-water-asia.pt"); DET_W = os.path.join(HERE, "models", "yolov8n.pt")
 CLASSES = [("Dry", 5, (46, 139, 87)), ("Ankle-deep", 20, (48, 194, 242)), ("Knee-deep", 50, (31, 123, 224)), ("Wheel-deep", 1e9, (43, 57, 192))]
 # typical real-world sizes in cm: (height, width when seen frontally, length when seen from the side)
 REF = {"person": (170, 45, 45), "car": (150, 180, 450), "truck": (300, 250, 800), "bus": (320, 250, 1200), "motorcycle": (110, 60, 210), "bicycle": (100, 45, 175),
@@ -22,7 +22,7 @@ def load_models():
     if not _models:
         from ultralytics import YOLO
         _models["water"] = YOLO(WATER_W); _models["det"] = YOLO(DET_W)
-        _models["water_in"] = YOLO(WATER_IN_W) if os.path.exists(WATER_IN_W) else None   # stage 2: self-trained on Indian footage
+        _models["water_in"] = YOLO(WATER_ASIA_W) if os.path.exists(WATER_ASIA_W) else (YOLO(WATER_IN_W) if os.path.exists(WATER_IN_W) else None)   # stage 3 (South-Asian flood photos) preferred, else stage 2
         _models["cls"] = YOLO(CLS_W) if os.path.exists(CLS_W) else None                    # depth-class classifier trained on hand-labelled flood photos
     return _models
 
